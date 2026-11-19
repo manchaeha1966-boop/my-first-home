@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>나의 첫 홈페이지</title>
+  <style>
+    /* 11월 늦가을 숲속 */
+    body {
+      margin: 0;
+      padding: 60px 16px;
+      box-sizing: border-box;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #4a3426;             /* 글자: 짙은 갈색 (나무껍질) */
+      /* 하늘 → 숲 → 낙엽 쌓인 땅 으로 이어지는 그라데이션 */
+      background: linear-gradient(
+        to bottom,
+        #f3dcb8 0%,               /* 늦가을 오후의 하늘 */
+        #e2b47c 45%,              /* 노을빛 숲 */
+        #a8642f 80%,              /* 단풍 든 나무 아래 */
+        #6e3d1d 100%              /* 낙엽 쌓인 땅 */
+      );
+    }
+
+    /* 숲 (나무 그림): 화면 아래쪽에 고정 */
+    .forest {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 70vh;
+      z-index: -2;                /* 글자 뒤로 보내기 */
+    }
+
+    /* 글 상자: 숲 위에서도 잘 읽히도록 반투명 상자 */
+    main {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 24px 28px;
+      background-color: rgba(255, 248, 236, 0.8);
+      border-radius: 16px;
+    }
+    h1 {
+      margin-top: 0;
+      color: #c2552b;             /* 제목: 감 주황색 */
+    }
+    p {
+      color: #7a5230;             /* 문단: 단풍잎 갈색 */
+    }
+    a {
+      color: #c2552b;             /* 링크: 감 주황색 */
+    }
+
+    /* ---------- 손글씨 폰트 (눈누: 그리운 묘은흘림체) ---------- */
+    @font-face {
+      font-family: 'NostalgicMyoeunHeullim';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2601-1@1.0/Griun_MyoeunHeullim-Rg.woff2') format('woff2');
+      font-weight: normal;
+      font-display: swap;
+    }
+
+    /* 이메일: 손글씨 + 형광펜 밑줄 느낌 */
+    .email {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      font-family: 'NostalgicMyoeunHeullim', cursive;
+      font-size: 26px;
+      color: #8a3b1c;
+      text-decoration: none;
+      /* 아래쪽 절반만 칠해서 형광펜으로 그은 느낌 */
+      background: linear-gradient(transparent 60%, rgba(240, 168, 80, 0.45) 60%);
+      transition: transform 0.2s;
+    }
+    .email:hover {
+      transform: rotate(-2deg) scale(1.05);   /* 마우스를 올리면 살짝 기울어짐 */
+    }
+
+    /* ---------- 배치 ---------- */
+    /* 제목 + 이메일을 세로로 묶기 */
+    .profile-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      min-width: 0;
+    }
+    .intro {
+      margin: 18px 0 22px;
+    }
+    /* 버튼 두 개: 같은 너비의 두 칸 */
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));  /* 두 칸 너비를 정확히 같게 */
+      gap: 16px;
+    }
+    .buttons .glow-inner {
+      width: 100%;
+      justify-content: center;     /* 글자를 버튼 가운데로 */
+      white-space: nowrap;
+    }    /* ---------- 마그네틱 글로우 버튼 ----------
+       빛이 테두리를 따라 돌고, 마우스 쪽으로 살짝 끌려오는 버튼 */
+
+    /* 회전 각도를 애니메이션할 수 있도록 '각도' 변수로 등록 */
+    @property --glow-angle {
+      syntax: "<angle>";
+      initial-value: 0deg;
+      inherits: false;
+    }
+    @keyframes glow-spin   { to { --glow-angle: 360deg; } }
+    @keyframes glow-ripple {
+      from { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+      to   { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+    }
+
+    .glow-btn {
+      /* 버튼마다 바꿔 쓰는 색 변수 */
+      --c1: #ffd27a;
+      --c2: #e8743b;
+      --c3: #c2552b;
+      --inner: #4a2e1c;
+
+      position: relative;
+      isolation: isolate;          /* 빛 번짐이 버튼 뒤에만 깔리도록 */
+      display: inline-flex;
+      padding: 2px;                /* 이 2px이 빛나는 테두리 두께 */
+      border-radius: 999px;
+      color: #fff;
+      font-weight: bold;
+      text-decoration: none;
+      transition: transform 0.3s ease-out;
+    }
+    /* 키보드(Tab)로 선택했을 때 테두리 표시 */
+    .glow-btn:focus-visible {
+      outline: 2px solid var(--c2);
+      outline-offset: 5px;
+    }
+
+    /* 돌아가는 무지개 테두리 */
+    .glow-ring,
+    .glow-halo {
+      position: absolute;
+      border-radius: inherit;
+      background: conic-gradient(from var(--glow-angle), var(--c1), var(--c2), var(--c3), var(--c1));
+      animation: glow-spin 3s linear infinite;
+      pointer-events: none;
+    }
+    .glow-ring { inset: 0; z-index: -1; }
+    /* 같은 색을 흐리게 깔아 빛 번짐 만들기 */
+    .glow-halo {
+      inset: -6px;
+      z-index: -2;
+      filter: blur(12px);
+      opacity: 0.4;
+      transition: opacity 0.3s;
+    }
+    .glow-btn:hover .glow-halo,
+    .glow-btn:focus-visible .glow-halo { opacity: 0.9; }
+
+    /* 버튼 안쪽 (진한 바탕) */
+    .glow-inner {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+      border-radius: inherit;
+      background-color: var(--inner);
+      padding: 11px 22px;
+      font-size: 15px;
+    }
+    /* 마우스 위치를 따라다니는 하이라이트 */
+    .glow-inner::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(90px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.25), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .glow-btn:hover .glow-inner::before { opacity: 1; }
+    .glow-label { position: relative; }
+
+    /* 클릭하면 퍼지는 물결 */
+    .glow-ripple {
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      pointer-events: none;
+      animation: glow-ripple 0.7s ease-out forwards;
+    }
+
+    /* 인스타그램 버튼: 색만 바꾸기 */
+    .glow-insta {
+      --c1: #f9a03f;
+      --c2: #e1306c;
+      --c3: #833ab4;
+      --inner: #2a1238;
+    }
+
+    /* 움직임 줄이기 설정을 켠 사용자는 회전·물결 끄기 */
+    @media (prefers-reduced-motion: reduce) {
+      .glow-ring, .glow-halo, .glow-ripple { animation: none; }
+      .glow-btn { transition: none; }
+    }
+
+    /* ---------- 프로필 사진 (하마) ---------- */
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 8px;
+    }
+    /* ---------- 홀로그램 틸트 프로필 ----------
+       JavaScript가 --tx, --ty(기울기 -1~1), --hyp(기운 정도), --flip(뒤집힘 각도),
+       --lift(뒤집힐 때 떠오름)를 매 순간 바꿔 주고, CSS는 그 값으로 모양을 그림 */
+    .holo {
+      --tx: 0;
+      --ty: 0;
+      --hyp: 0;
+      --flip: 0deg;
+      --lift: 0;
+      flex-shrink: 0;
+      width: 110px;
+      height: 110px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: none;
+      cursor: pointer;
+      perspective: 420px;          /* 3D 원근감 */
+      -webkit-tap-highlight-color: transparent;
+    }
+    .holo-card {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transform:
+        translateZ(calc(var(--lift) * 30px))
+        rotateX(calc(var(--ty) * -18deg))
+        rotateY(calc(var(--tx) * 22deg + var(--flip)));
+      transition: scale 0.3s cubic-bezier(.2, .9, .3, 1.4);
+    }
+    .holo:active .holo-card { scale: 0.95; }   /* 누르면 살짝 눌림 */
+
+    .holo-face {
+      position: absolute;
+      inset: 0;
+      display: block;
+      border-radius: 50%;          /* 동그랗게 */
+      overflow: hidden;
+      backface-visibility: hidden; /* 뒤집혔을 때 뒷모습 숨기기 */
+      -webkit-backface-visibility: hidden;
+      background-color: #fde3c4;
+      border: 4px solid #fff;
+      /* 기울수록 주황빛 후광이 커짐 */
+      box-shadow:
+        0 4px 14px rgba(110, 61, 29, 0.25),
+        0 0 calc(var(--hyp) * 26px) rgba(232, 116, 59, 0.55);
+    }
+    .avatar-art {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    /* 뒷면: 단풍색 원형 무늬 */
+    .holo-back {
+      transform: rotateY(180deg);
+      display: grid;
+      place-items: center;
+      background: conic-gradient(from calc(var(--tx) * 90deg), #ffd27a, #e8743b, #c2552b, #8a3b1c, #ffd27a);
+    }
+    .holo-back-text {
+      position: relative;
+      display: grid;
+      justify-items: center;
+      line-height: 1.1;
+      color: #fff;
+      font-size: 22px;
+      text-shadow: 0 1px 3px rgba(74, 46, 28, 0.6);
+    }
+    .holo-back-text b     { font-size: 15px; letter-spacing: 0.12em; margin-top: 2px; }
+    .holo-back-text small { font-size: 8px;  letter-spacing: 0.2em; opacity: 0.9; }
+
+    /* 무지개 포일: 기울기에 따라 무지개 띠가 미끄러짐 */
+    .holo-foil {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: repeating-linear-gradient(115deg,
+        hsl(10 100% 62%) 0%, hsl(45 100% 62%) 4%,
+        hsl(170 100% 62%) 8%, hsl(285 100% 66%) 12%, hsl(10 100% 62%) 16%);
+      background-size: 300% 300%;
+      background-position: calc(50% + var(--tx) * 40%) calc(50% + var(--ty) * 40%);
+      mix-blend-mode: overlay;
+      opacity: calc(0.2 + var(--hyp) * 0.55);
+    }
+    /* 반사광: 마우스 쪽에 하얀 빛 */
+    .holo-glare {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: radial-gradient(farthest-corner circle at calc(50% + var(--tx) * 48%) calc(50% + var(--ty) * 48%),
+        rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.28) 18%, transparent 55%);
+      mix-blend-mode: overlay;
+      opacity: calc(0.3 + var(--hyp) * 0.7);
+    }
+    /* 앞면으로 돌아올 때 한 번 지나가는 반짝임 */
+    .holo-shine {
+      position: absolute;
+      inset: -60%;
+      pointer-events: none;
+      background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, 0.6) 50%, transparent 58%);
+      translate: -70% 0;
+      opacity: 0;
+    }
+    .holo-shine.is-on { animation: holo-sweep 0.9s cubic-bezier(.3, .6, .2, 1); }
+    @keyframes holo-sweep {
+      from { translate: -70% 0; opacity: 1; }
+      to   { translate: 70% 0;  opacity: 1; }
+    }
+    /* 키보드로 선택했을 때 표시 */
+    .holo:focus-visible { outline: none; }
+    .holo:focus-visible .holo-face {
+      box-shadow: 0 0 0 3px #c2552b, 0 0 0 7px rgba(232, 116, 59, 0.35);
+    }
+    .profile h1 {
+      margin: 0;
+      word-break: keep-all;        /* 한글 단어 중간에서 줄바꿈하지 않기 */
+    }
+
+    /* ---------- 낙엽 ---------- */
+    .leaf {
+      position: fixed;
+      top: -10vh;
+      font-size: 28px;
+      z-index: -1;
+      pointer-events: none;       /* 낙엽이 클릭을 방해하지 않게 */
+      animation: fall linear infinite;
+    }
+    /* 떨어지는 낙엽: 위에서 아래로, 좌우로 흔들리며 빙글빙글 */
+    @keyframes fall {
+      0%   { transform: translate(0, 0) rotate(0deg); }
+      25%  { transform: translate(40px, 30vh) rotate(90deg); }
+      50%  { transform: translate(-30px, 60vh) rotate(200deg); }
+      75%  { transform: translate(30px, 90vh) rotate(290deg); }
+      100% { transform: translate(-10px, 115vh) rotate(360deg); }
+    }
+
+    /* 바닥을 구르는 낙엽: 왼쪽에서 오른쪽으로 데굴데굴 */
+    .rolling {
+      position: fixed;
+      bottom: 2vh;
+      left: -10vw;
+      font-size: 32px;
+      z-index: -1;
+      pointer-events: none;
+      animation: roll linear infinite;
+    }
+    @keyframes roll {
+      0%   { transform: translateX(0) rotate(0deg); }
+      100% { transform: translateX(120vw) rotate(1080deg); }
+    }
+
+    /* 낙엽마다 위치, 속도, 시작 시간을 다르게 */
+    .l1 { left: 5%;  animation-duration: 11s; animation-delay: 0s; }
+    .l2 { left: 18%; animation-duration: 14s; animation-delay: 3s;  font-size: 22px; }
+    .l3 { left: 32%; animation-duration: 10s; animation-delay: 6s; }
+    .l4 { left: 47%; animation-duration: 13s; animation-delay: 1s;  font-size: 34px; }
+    .l5 { left: 60%; animation-duration: 12s; animation-delay: 8s;  font-size: 20px; }
+    .l6 { left: 74%; animation-duration: 15s; animation-delay: 4s; }
+    .l7 { left: 88%; animation-duration: 11s; animation-delay: 7s;  font-size: 24px; }
+    .r1 { animation-duration: 9s;  animation-delay: 0s; }
+    .r2 { animation-duration: 12s; animation-delay: 5s; bottom: 5vh; font-size: 26px; }
+
+    /* 움직임을 줄이도록 설정한 사용자를 위해 애니메이션 끄기 */
+    @media (prefers-reduced-motion: reduce) {
+      .leaf, .rolling { animation: none; display: none; }
+    }
+
+    /* 휴대폰처럼 좁은 화면: 프로필을 가운데 세로 정렬, 버튼 글자 조금 작게
+       (위의 기본 설정을 덮어써야 하므로 맨 마지막에 둠) */
+    @media (max-width: 480px) {
+      main { padding: 22px 18px; }
+      .profile { flex-direction: column; text-align: center; gap: 12px; }
+      .profile-text { align-items: center; }
+      .holo { width: 96px; height: 96px; }
+      .email { font-size: 22px; }
+      .intro { text-align: center; }
+      .buttons { gap: 10px; }
+      .buttons .glow-inner { padding: 11px 4px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 숲 그림 (SVG: 코드로 그리는 그림) -->
+  <svg class="forest" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <!-- 뒤쪽 나무들 (흐리고 연하게) -->
+    <g opacity="0.45">
+      <rect x="90"  y="200" width="18" height="400" fill="#5a3a24"/>
+      <circle cx="99"  cy="200" r="90"  fill="#d9822b"/>
+      <rect x="380" y="160" width="20" height="440" fill="#5a3a24"/>
+      <circle cx="390" cy="170" r="110" fill="#c0392b"/>
+      <rect x="700" y="190" width="18" height="410" fill="#5a3a24"/>
+      <circle cx="709" cy="190" r="95"  fill="#e0a030"/>
+      <rect x="1010" y="170" width="20" height="430" fill="#5a3a24"/>
+      <circle cx="1020" cy="175" r="105" fill="#b9472a"/>
+    </g>
+    <!-- 앞쪽 나무들 (진하게) -->
+    <g>
+      <rect x="230" y="260" width="28" height="340" fill="#4a2e1c"/>
+      <circle cx="244" cy="250" r="120" fill="#c2552b"/>
+      <circle cx="190" cy="300" r="70"  fill="#d9822b"/>
+      <rect x="560" y="300" width="24" height="300" fill="#4a2e1c"/>
+      <circle cx="572" cy="290" r="100" fill="#e3a23a"/>
+      <circle cx="630" cy="330" r="60"  fill="#c2552b"/>
+      <rect x="880" y="250" width="30" height="350" fill="#4a2e1c"/>
+      <circle cx="895" cy="240" r="125" fill="#a8392a"/>
+      <circle cx="960" cy="300" r="70"  fill="#d9822b"/>
+    </g>
+    <!-- 낙엽이 쌓인 땅 -->
+    <path d="M0 540 Q300 510 600 535 T1200 525 V600 H0 Z" fill="#7a421f"/>
+  </svg>
+
+  <!-- 떨어지는 낙엽 -->
+  <span class="leaf l1">🍁</span>
+  <span class="leaf l2">🍂</span>
+  <span class="leaf l3">🍁</span>
+  <span class="leaf l4">🍂</span>
+  <span class="leaf l5">🍁</span>
+  <span class="leaf l6">🍂</span>
+  <span class="leaf l7">🍁</span>
+  <!-- 바닥을 구르는 낙엽 -->
+  <span class="rolling r1">🍂</span>
+  <span class="rolling r2">🍁</span>
+
+  <main>
+    <div class="profile">
+      <!-- 프로필 사진: 귀여운 하마 (SVG로 직접 그림) -->
+      <!-- 홀로그램 틸트: 마우스를 따라 기울고 무지개빛으로 반짝이며, 누르면 뒤집힘 -->
+      <button class="holo" type="button" aria-pressed="false" aria-label="귀여운 하마 프로필 카드 뒤집기">
+        <span class="holo-card">
+          <span class="holo-face holo-front">
+      <svg class="avatar-art" viewBox="0 0 120 120" aria-hidden="true">
+        <!-- 귀 -->
+        <ellipse cx="34" cy="30" rx="10" ry="12" fill="#9b8fc9"/>
+        <ellipse cx="86" cy="30" rx="10" ry="12" fill="#9b8fc9"/>
+        <ellipse cx="34" cy="31" rx="5"  ry="7"  fill="#f2a7b8"/>
+        <ellipse cx="86" cy="31" rx="5"  ry="7"  fill="#f2a7b8"/>
+        <!-- 머리 -->
+        <ellipse cx="60" cy="55" rx="36" ry="32" fill="#b3a8e0"/>
+        <!-- 눈 -->
+        <circle cx="45" cy="48" r="6" fill="#3b2a4d"/>
+        <circle cx="75" cy="48" r="6" fill="#3b2a4d"/>
+        <circle cx="47" cy="46" r="2" fill="#fff"/>
+        <circle cx="77" cy="46" r="2" fill="#fff"/>
+        <!-- 큰 주둥이 -->
+        <ellipse cx="60" cy="82" rx="40" ry="26" fill="#c9bff0"/>
+        <!-- 콧구멍 -->
+        <ellipse cx="48" cy="74" rx="4" ry="5" fill="#7d6fb0"/>
+        <ellipse cx="72" cy="74" rx="4" ry="5" fill="#7d6fb0"/>
+        <!-- 볼터치 -->
+        <ellipse cx="28" cy="80" rx="7" ry="4" fill="#f4a6b4" opacity="0.8"/>
+        <ellipse cx="92" cy="80" rx="7" ry="4" fill="#f4a6b4" opacity="0.8"/>
+        <!-- 웃는 입 -->
+        <path d="M50 90 Q60 98 70 90" stroke="#7d6fb0" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- 머리 위 단풍잎 -->
+        <path d="M60 14 L64 22 L72 20 L67 27 L74 32 L65 32 L60 40 L55 32 L46 32 L53 27 L48 20 L56 22 Z" fill="#d9542b"/>
+      </svg>
+            <span class="holo-foil" aria-hidden="true"></span>
+            <span class="holo-glare" aria-hidden="true"></span>
+            <span class="holo-shine" aria-hidden="true"></span>
+          </span>
+          <!-- 카드 뒷면 -->
+          <span class="holo-face holo-back" aria-hidden="true">
+            <span class="holo-back-text">🍁<b>HIPPO</b><small>2026 AUTUMN</small></span>
+            <span class="holo-foil"></span>
+            <span class="holo-glare"></span>
+          </span>
+        </span>
+      </button>
+      <!-- 이름 바로 아래에 연락처: 명함처럼 '누구인지 + 연락처'를 한 덩어리로 -->
+      <div class="profile-text">
+        <h1>안녕하세요!</h1>
+        <a class="email" href="mailto:h9215745@naver.com">✉ h9215745@naver.com</a>
+      </div>
+    </div>
+    <p class="intro">여기는 나의 첫 번째 홈페이지입니다.</p>
+    <!-- 버튼 두 개를 같은 너비로 나란히 -->
+    <div class="buttons">
+      <!-- 블로그 버튼: 누르면 새 탭에서 내 네이버 블로그가 열림 -->
+      <a class="glow-btn" href="https://blog.naver.com/h9215745" target="_blank" rel="noopener">
+        <span class="glow-halo" aria-hidden="true"></span>
+        <span class="glow-ring" aria-hidden="true"></span>
+        <span class="glow-inner"><span class="glow-label">📝 내 블로그 가기</span></span>
+      </a>
+      <!-- 인스타그램 버튼 -->
+      <a class="glow-btn glow-insta" href="https://www.instagram.com/smartmanchae/" target="_blank" rel="noopener">
+        <span class="glow-halo" aria-hidden="true"></span>
+        <span class="glow-ring" aria-hidden="true"></span>
+        <span class="glow-inner"><span class="glow-label">📷 @smartmanchae</span></span>
+      </a>
+    </div>
+  </main>
+
+  <script>
+    // 마그네틱 글로우 버튼: 마우스를 따라 끌려오기 + 하이라이트 + 클릭 물결
+    const STRENGTH = 12; // 끌려가는 최대 거리(px)
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    document.querySelectorAll(".glow-btn").forEach((btn) => {
+      const inner = btn.querySelector(".glow-inner");
+
+      btn.addEventListener("pointermove", (event) => {
+        const box = btn.getBoundingClientRect();
+        const x = (event.clientX - box.left) / box.width;   // 0 ~ 1
+        const y = (event.clientY - box.top) / box.height;   // 0 ~ 1
+        inner.style.setProperty("--mx", x * 100 + "%");
+        inner.style.setProperty("--my", y * 100 + "%");
+        if (!reduceMotion) {
+          btn.style.transform = `translate(${(x - 0.5) * STRENGTH}px, ${(y - 0.5) * STRENGTH}px)`;
+        }
+      });
+
+      btn.addEventListener("pointerleave", () => {
+        btn.style.transform = "";
+      });
+
+      btn.addEventListener("click", (event) => {
+        if (reduceMotion) return;
+        const box = inner.getBoundingClientRect();
+        const ripple = document.createElement("span");
+        ripple.className = "glow-ripple";
+        ripple.setAttribute("aria-hidden", "true");
+        ripple.style.left = event.clientX - box.left + "px";
+        ripple.style.top = event.clientY - box.top + "px";
+        inner.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 700);
+      });
+    });
+
+    // ---------- 홀로그램 틸트 프로필 ----------
+    const holo = document.querySelector(".holo");
+    const stage = document.querySelector("main");   // 글 상자 어디서든 마우스를 따라 기울기
+    const shine = holo.querySelector(".holo-shine");
+    const pointer = { x: 0, y: 0, active: false };
+    let flipped = false;
+
+    // 스프링: 목표까지의 거리만큼 가속하고 감쇠로 속도를 줄여,
+    // 살짝 지나쳤다가 돌아오는 '통통 튀는' 움직임을 만듭니다.
+    function spring(s, target, stiffness, damping) {
+      if (reduceMotion) { s.value = target; s.speed = 0; return; }
+      s.speed = (s.speed + (target - s.value) * stiffness) * damping;
+      s.value += s.speed;
+    }
+    const clamp = (v) => Math.max(-1, Math.min(1, v));
+
+    stage.addEventListener("pointermove", (event) => {
+      const box = holo.getBoundingClientRect();
+      const reach = box.width * 2;   // 사진에서 이만큼 떨어지면 최대로 기울어짐
+      pointer.x = clamp((event.clientX - (box.left + box.width / 2)) / reach);
+      pointer.y = clamp((event.clientY - (box.top + box.height / 2)) / reach);
+      pointer.active = true;
+    });
+    stage.addEventListener("pointerleave", () => { pointer.active = false; });
+
+    holo.addEventListener("click", () => {
+      flipped = !flipped;
+      holo.setAttribute("aria-pressed", String(flipped));
+      if (!flipped && !reduceMotion) {
+        // 앞면으로 돌아오면 반짝임을 한 번 다시 재생
+        setTimeout(() => {
+          shine.classList.remove("is-on");
+          void shine.offsetWidth;          // 애니메이션 처음부터 다시 시작하기 위한 요령
+          shine.classList.add("is-on");
+        }, 380);
+      }
+    });
+
+    const tiltX = { value: 0, speed: 0 };
+    const tiltY = { value: 0, speed: 0 };
+    const flip  = { value: 0, speed: 0 };
+    let last = performance.now();
+    let elapsed = 0;
+
+    function loop(now) {
+      const delta = Math.min(48, now - last);
+      last = now;
+      elapsed += delta;
+      const t = elapsed / 1000;
+      // 마우스가 없으면 천천히 흔들리며 반짝이기 (움직임 줄이기 설정이면 가만히)
+      const targetX = reduceMotion ? 0 : pointer.active ? pointer.x : Math.sin(t * 0.9) * 0.5;
+      const targetY = reduceMotion ? 0 : pointer.active ? pointer.y : Math.cos(t * 0.65) * 0.3;
+      for (let i = 0; i < Math.max(1, Math.round(delta / 16.7)); i++) {
+        spring(tiltX, targetX, 0.08, 0.8);
+        spring(tiltY, targetY, 0.08, 0.8);
+        spring(flip, flipped ? 180 : 0, 0.05, 0.82);
+      }
+      const progress = Math.min(1, Math.max(0, flip.value / 180));
+      holo.style.setProperty("--tx", tiltX.value.toFixed(4));
+      holo.style.setProperty("--ty", tiltY.value.toFixed(4));
+      holo.style.setProperty("--hyp", Math.min(1, Math.hypot(tiltX.value, tiltY.value)).toFixed(4));
+      holo.style.setProperty("--flip", flip.value.toFixed(2) + "deg");
+      holo.style.setProperty("--lift", Math.sin(progress * Math.PI).toFixed(4));
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
