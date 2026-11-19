@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>나의 첫 홈페이지</title>
   <style>
-    /* 11월 늦가을 숲속 */
+    /* 크리스마스 눈 내리는 밤 */
     body {
       margin: 0;
       padding: 60px 16px;
@@ -13,13 +13,13 @@
       min-height: 100vh;
       overflow-x: hidden;
       color: #4a3426;             /* 글자: 짙은 갈색 (나무껍질) */
-      /* 하늘 → 숲 → 낙엽 쌓인 땅 으로 이어지는 그라데이션 */
+      /* 깊은 밤하늘 → 눈빛에 밝아지는 지평선 */
       background: linear-gradient(
         to bottom,
-        #f3dcb8 0%,               /* 늦가을 오후의 하늘 */
-        #e2b47c 45%,              /* 노을빛 숲 */
-        #a8642f 80%,              /* 단풍 든 나무 아래 */
-        #6e3d1d 100%              /* 낙엽 쌓인 땅 */
+        #0b1430 0%,               /* 한밤의 하늘 */
+        #1b2d5c 45%,              /* 푸른 겨울밤 */
+        #3a5488 75%,              /* 눈빛이 비치는 숲 */
+        #8fa8d0 100%              /* 눈 덮인 땅 근처 */
       );
     }
 
@@ -38,7 +38,7 @@
       max-width: 600px;
       margin: 0 auto;
       padding: 24px 28px;
-      background-color: rgba(255, 248, 236, 0.8);
+      background-color: rgba(255, 250, 244, 0.93);   /* 어두운 밤 배경에서도 밝게 */
       border-radius: 16px;
     }
     h1 {
@@ -338,16 +338,18 @@
       word-break: keep-all;        /* 한글 단어 중간에서 줄바꿈하지 않기 */
     }
 
-    /* ---------- 낙엽 ---------- */
+    /* ---------- 눈송이 ---------- */
     .leaf {
       position: fixed;
       top: -10vh;
       font-size: 28px;
+      color: #fff;
+      text-shadow: 0 0 6px rgba(255, 255, 255, 0.8);   /* 은은하게 빛나는 눈 */
       z-index: -1;
       pointer-events: none;       /* 낙엽이 클릭을 방해하지 않게 */
       animation: fall linear infinite;
     }
-    /* 떨어지는 낙엽: 위에서 아래로, 좌우로 흔들리며 빙글빙글 */
+    /* 내리는 눈: 위에서 아래로, 좌우로 흔들리며 빙글빙글 */
     @keyframes fall {
       0%   { transform: translate(0, 0) rotate(0deg); }
       25%  { transform: translate(40px, 30vh) rotate(90deg); }
@@ -356,22 +358,17 @@
       100% { transform: translate(-10px, 115vh) rotate(360deg); }
     }
 
-    /* 바닥을 구르는 낙엽: 왼쪽에서 오른쪽으로 데굴데굴 */
-    .rolling {
-      position: fixed;
-      bottom: 2vh;
-      left: -10vw;
-      font-size: 32px;
-      z-index: -1;
-      pointer-events: none;
-      animation: roll linear infinite;
+    /* 트리 전구 반짝반짝 */
+    .bulb { animation: twinkle 1.6s ease-in-out infinite alternate; }
+    .bulb:nth-child(3n)   { animation-delay: 0.5s; }
+    .bulb:nth-child(3n+1) { animation-delay: 1s; }
+    @keyframes twinkle {
+      from { opacity: 1; }
+      to   { opacity: 0.35; }
     }
-    @keyframes roll {
-      0%   { transform: translateX(0) rotate(0deg); }
-      100% { transform: translateX(120vw) rotate(1080deg); }
-    }
+    .star-top { animation: twinkle 2.4s ease-in-out infinite alternate; }
 
-    /* 낙엽마다 위치, 속도, 시작 시간을 다르게 */
+    /* 눈송이마다 위치, 속도, 시작 시간, 크기를 다르게 */
     .l1 { left: 5%;  animation-duration: 11s; animation-delay: 0s; }
     .l2 { left: 18%; animation-duration: 14s; animation-delay: 3s;  font-size: 22px; }
     .l3 { left: 32%; animation-duration: 10s; animation-delay: 6s; }
@@ -379,12 +376,16 @@
     .l5 { left: 60%; animation-duration: 12s; animation-delay: 8s;  font-size: 20px; }
     .l6 { left: 74%; animation-duration: 15s; animation-delay: 4s; }
     .l7 { left: 88%; animation-duration: 11s; animation-delay: 7s;  font-size: 24px; }
-    .r1 { animation-duration: 9s;  animation-delay: 0s; }
-    .r2 { animation-duration: 12s; animation-delay: 5s; bottom: 5vh; font-size: 26px; }
+    .l8  { left: 12%; animation-duration: 16s; animation-delay: 9s;  font-size: 16px; }
+    .l9  { left: 39%; animation-duration: 12s; animation-delay: 2s;  font-size: 18px; }
+    .l10 { left: 54%; animation-duration: 17s; animation-delay: 5s;  font-size: 14px; }
+    .l11 { left: 68%; animation-duration: 13s; animation-delay: 10s; font-size: 18px; }
+    .l12 { left: 94%; animation-duration: 15s; animation-delay: 2s;  font-size: 16px; }
 
     /* 움직임을 줄이도록 설정한 사용자를 위해 애니메이션 끄기 */
     @media (prefers-reduced-motion: reduce) {
-      .leaf, .rolling { animation: none; display: none; }
+      .leaf { animation: none; display: none; }
+      .bulb, .star-top { animation: none; }
     }
 
     /* 휴대폰처럼 좁은 화면: 프로필을 가운데 세로 정렬, 버튼 글자 조금 작게
@@ -404,44 +405,81 @@
 <body>
   <!-- 숲 그림 (SVG: 코드로 그리는 그림) -->
   <svg class="forest" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-    <!-- 뒤쪽 나무들 (흐리고 연하게) -->
+    <!-- 달과 별 -->
+    <circle cx="1080" cy="70" r="38" fill="#fff6d8" opacity="0.9"/>
+    <circle cx="1095" cy="60" r="34" fill="#16264f" opacity="0.9"/>
+    <g fill="#fff">
+      <circle cx="120" cy="40"  r="2"/>
+      <circle cx="300" cy="90"  r="1.5"/>
+      <circle cx="520" cy="30"  r="2"/>
+      <circle cx="760" cy="80"  r="1.5"/>
+      <circle cx="900" cy="25"  r="2"/>
+      <circle cx="60"  cy="150" r="1.5"/>
+      <circle cx="1160" cy="170" r="1.5"/>
+    </g>
+    <!-- 뒤쪽 눈 덮인 소나무들 (흐리고 연하게) -->
     <g opacity="0.45">
-      <rect x="90"  y="200" width="18" height="400" fill="#5a3a24"/>
-      <circle cx="99"  cy="200" r="90"  fill="#d9822b"/>
-      <rect x="380" y="160" width="20" height="440" fill="#5a3a24"/>
-      <circle cx="390" cy="170" r="110" fill="#c0392b"/>
-      <rect x="700" y="190" width="18" height="410" fill="#5a3a24"/>
-      <circle cx="709" cy="190" r="95"  fill="#e0a030"/>
-      <rect x="1010" y="170" width="20" height="430" fill="#5a3a24"/>
-      <circle cx="1020" cy="175" r="105" fill="#b9472a"/>
+      <polygon points="90,230 160,420 20,420" fill="#1e4a3a"/>
+      <polygon points="90,230 112,290 68,290" fill="#eef4ff"/>
+      <polygon points="380,200 470,430 290,430" fill="#1e4a3a"/>
+      <polygon points="380,200 408,270 352,270" fill="#eef4ff"/>
+      <polygon points="700,240 770,420 630,420" fill="#1e4a3a"/>
+      <polygon points="700,240 722,296 678,296" fill="#eef4ff"/>
+      <polygon points="1150,210 1230,420 1070,420" fill="#1e4a3a"/>
+      <polygon points="1150,210 1175,275 1125,275" fill="#eef4ff"/>
     </g>
-    <!-- 앞쪽 나무들 (진하게) -->
+    <!-- 앞쪽 소나무들 -->
     <g>
-      <rect x="230" y="260" width="28" height="340" fill="#4a2e1c"/>
-      <circle cx="244" cy="250" r="120" fill="#c2552b"/>
-      <circle cx="190" cy="300" r="70"  fill="#d9822b"/>
-      <rect x="560" y="300" width="24" height="300" fill="#4a2e1c"/>
-      <circle cx="572" cy="290" r="100" fill="#e3a23a"/>
-      <circle cx="630" cy="330" r="60"  fill="#c2552b"/>
-      <rect x="880" y="250" width="30" height="350" fill="#4a2e1c"/>
-      <circle cx="895" cy="240" r="125" fill="#a8392a"/>
-      <circle cx="960" cy="300" r="70"  fill="#d9822b"/>
+      <rect x="226" y="470" width="20" height="70" fill="#4a2e1c"/>
+      <polygon points="236,260 330,480 142,480" fill="#17533c"/>
+      <polygon points="236,260 268,334 204,334" fill="#ffffff"/>
+      <rect x="512" y="490" width="18" height="50" fill="#4a2e1c"/>
+      <polygon points="521,320 600,500 442,500" fill="#1a5e44"/>
+      <polygon points="521,320 547,380 495,380" fill="#ffffff"/>
     </g>
-    <!-- 낙엽이 쌓인 땅 -->
-    <path d="M0 540 Q300 510 600 535 T1200 525 V600 H0 Z" fill="#7a421f"/>
+    <!-- 크리스마스 트리 -->
+    <g>
+      <rect x="935" y="510" width="30" height="40" fill="#5a3a24"/>
+      <polygon points="950,250 1030,380 870,380" fill="#1f7a4d"/>
+      <polygon points="950,320 1060,460 840,460" fill="#1c6e45"/>
+      <polygon points="950,400 1090,530 810,530" fill="#18623d"/>
+      <!-- 반짝이는 전구 -->
+      <g>
+        <circle class="bulb" cx="930"  cy="350" r="7" fill="#ff4d4d"/>
+        <circle class="bulb" cx="975"  cy="365" r="7" fill="#ffd34d"/>
+        <circle class="bulb" cx="900"  cy="430" r="7" fill="#5ab4ff"/>
+        <circle class="bulb" cx="955"  cy="420" r="7" fill="#ff4d4d"/>
+        <circle class="bulb" cx="1010" cy="440" r="7" fill="#ffd34d"/>
+        <circle class="bulb" cx="860"  cy="510" r="7" fill="#ffd34d"/>
+        <circle class="bulb" cx="920"  cy="495" r="7" fill="#5ab4ff"/>
+        <circle class="bulb" cx="985"  cy="500" r="7" fill="#ff4d4d"/>
+        <circle class="bulb" cx="1045" cy="515" r="7" fill="#5ab4ff"/>
+      </g>
+      <!-- 꼭대기 별 -->
+      <path class="star-top" d="M950 222 L958 242 L980 244 L963 258 L969 280 L950 268 L931 280 L937 258 L920 244 L942 242 Z" fill="#ffd34d"/>
+      <!-- 선물 상자 -->
+      <rect x="1000" y="520" width="34" height="28" fill="#d62f3a"/>
+      <rect x="1014" y="520" width="6"  height="28" fill="#ffd34d"/>
+      <rect x="860"  y="526" width="28" height="22" fill="#2f7fd6"/>
+      <rect x="871"  y="526" width="6"  height="22" fill="#ffffff"/>
+    </g>
+    <!-- 눈 쌓인 땅 -->
+    <path d="M0 540 Q300 515 600 535 T1200 525 V600 H0 Z" fill="#eef4ff"/>
   </svg>
 
-  <!-- 떨어지는 낙엽 -->
-  <span class="leaf l1">🍁</span>
-  <span class="leaf l2">🍂</span>
-  <span class="leaf l3">🍁</span>
-  <span class="leaf l4">🍂</span>
-  <span class="leaf l5">🍁</span>
-  <span class="leaf l6">🍂</span>
-  <span class="leaf l7">🍁</span>
-  <!-- 바닥을 구르는 낙엽 -->
-  <span class="rolling r1">🍂</span>
-  <span class="rolling r2">🍁</span>
+  <!-- 내리는 눈송이 -->
+  <span class="leaf l1" aria-hidden="true">❄</span>
+  <span class="leaf l2" aria-hidden="true">❅</span>
+  <span class="leaf l3" aria-hidden="true">❆</span>
+  <span class="leaf l4" aria-hidden="true">❄</span>
+  <span class="leaf l5" aria-hidden="true">❅</span>
+  <span class="leaf l6" aria-hidden="true">❆</span>
+  <span class="leaf l7" aria-hidden="true">❄</span>
+  <span class="leaf l8" aria-hidden="true">•</span>
+  <span class="leaf l9" aria-hidden="true">❅</span>
+  <span class="leaf l10" aria-hidden="true">•</span>
+  <span class="leaf l11" aria-hidden="true">❆</span>
+  <span class="leaf l12" aria-hidden="true">•</span>
 
   <main>
     <div class="profile">
